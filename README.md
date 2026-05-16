@@ -5,6 +5,23 @@ Runs both brands in one command. All files are in this single folder.
 
 ---
 
+## Project Structure
+
+```bash
+final_QA/
+│
+├── playwright-report/
+│   ├── data/
+│   └── index.html
+│
+├── .env
+├── .gitignore
+├── begenuin.spec.ts
+├── package.json
+├── playwright.config.ts
+└── README.md
+```
+
 ## Files in this folder
 
 | File | What it does |

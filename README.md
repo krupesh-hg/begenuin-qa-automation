@@ -11,12 +11,12 @@ Runs both brands in one command. All files are in this single folder.
 |---|---|
 | `begenuin.spec.ts` | All 18 test cases (Auth, Brand elements, Feed) |
 | `playwright.config.ts` | Sets up BeGenuin + Carlist as two test brands |
-| `.env` | Your login credentials (never commit this!) |
+| `.env` | Login credentials |
 | `package.json` | Project dependencies |
 
 ---
 
-## Setup (do this once)
+## Setup 
 
 ### 1. Install Node.js
 Download from https://nodejs.org — install the LTS version.
@@ -91,8 +91,3 @@ npm run test:report
 
 ---
 
-## Submission checklist
-- [ ] Run `npm test`
-- [ ] Open report: `npm run test:report`
-- [ ] Push this folder to a GitHub repo
-- [ ] Share the repo with `submissions@begenuin.com`

@@ -1,110 +1,121 @@
-# BeGenuin — Playwright Automation Tests
+# BeGenuin & Carlist — Playwright Automation Tests
 
-Automated tests for **BeGenuin** and **Carlist** web apps using Playwright + TypeScript.
-Runs both brands in one command. All files are in this single folder.
+Automated end-to-end tests for **BeGenuin** (`begenuin.com`) and **Carlist** (`community.carlist.my`) web applications using Playwright + TypeScript.
 
 ---
 
-## Project Structure
+## 📁 Files in this folder
 
-```bash
-final_QA/
-│
-├── playwright-report/
-│   ├── data/
-│   └── index.html
-│
-├── .env
-├── .gitignore
-├── begenuin.spec.ts
-├── package.json
-├── playwright.config.ts
-└── README.md
-```
-
-## Files in this folder
-
-| File | What it does |
+| File | Purpose |
 |---|---|
-| `begenuin.spec.ts` | All 18 test cases (Auth, Brand elements, Feed) |
-| `playwright.config.ts` | Sets up BeGenuin + Carlist as two test brands |
-| `.env` | Login credentials |
+| `begenuin.spec.ts` | All 13 test cases |
+| `playwright.config.ts` | Config — Edge browser, both brand URLs, session loading |
+| `save-session.ts` | Run once to save your login session |
 | `package.json` | Project dependencies |
+| `.env.example` | Template for environment variables |
+| `.gitignore` | Excludes node_modules, session, reports |
 
 ---
 
-## Setup 
+## ✅ Test Cases
+
+| TC | Description | Login Required |
+|---|---|---|
+| TC-001 | Homepage loads successfully | No |
+| TC-002 | Login button visible when logged out | No |
+| TC-003 | Clicking Login opens Sign in popup | No |
+| TC-004 | Login popup has Continue button | No |
+| TC-005 | Login popup closes with X button | No |
+| TC-006 | User is logged in — Log in button count = 0 | Yes (session) |
+| TC-007 | Home tab is visible | No |
+| TC-008 | Popular tab navigates correctly | No |
+| TC-009 | Latest tab navigates correctly | No |
+| TC-010 | Explore tab navigates correctly | No |
+| TC-011 | Profile page loads for 23bcp360 | Yes (session) |
+| TC-012 | Settings opens from profile menu | Yes (session) |
+| TC-013 | Logout shows Log in button again | Yes (session) |
+
+> Tests run on **both brands** automatically — 13 tests × 2 brands = **26 total test runs**
+
+---
+
+## 🚀 Setup (do this once)
 
 ### 1. Install Node.js
-Download from https://nodejs.org — install the LTS version.
+Download LTS version from https://nodejs.org
 
-### 2. Open terminal in this folder
-```
-cd path/to/begenuin-qa-flat
-```
-
-### 3. Install dependencies
-```
+### 2. Clone the repo and install dependencies
+```bash
+git clone https://github.com/YOUR_USERNAME/begenuin-qa-automation.git
+cd begenuin-qa-automation
 npm install
 ```
 
-### 4. Install Playwright browser
-```
-npx playwright install chromium
+### 3. Install Playwright with Edge browser
+```bash
+npx playwright install msedge
 ```
 
-### 5. Add your credentials to .env
-Open the `.env` file and fill in:
+### 4. Save your login session (IMPORTANT)
+```bash
+npx ts-node save-session.ts
 ```
-TEST_EMAIL=your@email.com
-TEST_PASSWORD=yourpassword
+
+This opens Edge browser — **do not close it!**
+
+- **Step 1:** Login on BeGenuin manually (Google, OTP, whatever works) → press **Enter** in terminal
+- **Step 2:** Login on Carlist manually → press **Enter** in terminal
+- Session saved to `session.json` — covers both sites ✅
+
+> ⚠️ Never upload `session.json` to GitHub — it contains your login data!
+
+---
+
+## ▶️ Running Tests
+
+### Run all tests (both brands)
+```bash
+npx playwright test
+```
+
+### Watch tests run in Edge browser (headed mode)
+Already enabled by default — Edge opens automatically for each test.
+
+### View HTML report after running
+```bash
+npx playwright show-report
+```
+
+### Run only BeGenuin tests
+```bash
+npx playwright test --project=begenuin
+```
+
+### Run only Carlist tests
+```bash
+npx playwright test --project=carlist
+```
+
+### Run a specific test by name
+```bash
+npx playwright test -g "TC-006"
 ```
 
 ---
 
-## Running tests
+## 🔑 Key Design Decisions
 
-### Run all tests for both brands
-```
-npm test
-```
+### Session-based login
+Google login opens a new window that Playwright cannot control (Google blocks automation for security). OTP changes every time. Solution: **save session once manually**, reuse it in all tests automatically via `storageState` in config.
 
-### Run with browser visible (you can watch it)
-```
-npm run test:headed
-```
+### dismissPopups() helper
+The site shows unexpected popups like "Become a Creator" which block tests. Every test calls `dismissPopups()` after navigation — it finds and closes all modal close buttons, then presses Escape as backup.
 
-### View the test report after running
-```
-npm run test:report
-```
+### clickProfileButton() helper
+The profile/avatar button has no stable `id` or `data-testid`. The helper tries 9 different selectors and confirms success by checking if the Settings/Logout menu appears.
 
----
+### TC-006 login check
+Uses `.count()` instead of `.isVisible()` — counts how many "Log in" elements exist. `0 = logged in (PASS)`, `>0 = not logged in (FAIL)`. More reliable as it never throws errors.
 
-## Test cases
-
-| TC ID | Test | Needs login? |
-|---|---|---|
-| TC-AUTH-001 | Login button visible | No |
-| TC-AUTH-002 | Email + password fields appear | No |
-| TC-AUTH-003 | Successful login | Yes |
-| TC-AUTH-004 | Logout works | Yes |
-| TC-AUTH-005 | Wrong password shows error | No |
-| TC-AUTH-006 | Empty form shows validation | No |
-| TC-BRAND-001 | "Get App" button present | No |
-| TC-BRAND-002 | "Get App" opens app store | No |
-| TC-BRAND-003 | "Become a Creator" badge visible | No |
-| TC-BRAND-004 | Badge is inside the sidebar | No |
-| TC-BRAND-005 | Repost button visible | No |
-| TC-BRAND-006 | Repost button enabled | No |
-| TC-FEED-001 | Feed loads with posts | No |
-| TC-FEED-002 | Like button visible | No |
-| TC-FEED-003 | Like toggles state | Yes |
-| TC-FEED-004 | Comment box opens | No |
-| TC-FEED-005 | Posting a comment works | Yes |
-| TC-FEED-006 | Repost shows confirmation | Yes |
-
-> Tests that need login are skipped automatically if .env is not filled.
-
----
-
+### Multi-brand via projects
+`playwright.config.ts` defines two projects with different `baseURL`. The same test file runs for both brands automatically — adding a new brand = one new entry in the projects array.
